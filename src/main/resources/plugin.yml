@@ -1,0 +1,5 @@
+name: ArcanumOcculta
+version: '${version}'
+main: app.simplexdev.arcanumocculta.ArcanumOcculta
+api-version: '1.20'
+load: STARTUP
