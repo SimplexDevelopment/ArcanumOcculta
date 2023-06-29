@@ -1,44 +1,68 @@
 package app.simplexdev.arcanumocculta.base.spell;
 
+import app.simplexdev.arcanumocculta.api.effect.Effect;
 import app.simplexdev.arcanumocculta.api.spell.Spell;
-import app.simplexdev.arcanumocculta.api.spell.SpellProjectile;
-import org.bukkit.entity.Projectile;
 
 import java.time.Duration;
 
-public class AbstractSpell implements Spell {
+public abstract class AbstractSpell<T extends Effect> implements Spell<T> {
+    private final String name;
+    private final String description;
+    private final double manaCost;
+    private final Duration coolDown;
+    private final int spellLevel;
+    private final T spellEffect;
+
+    private long coolDownEnd;
+
+    protected AbstractSpell(String name, String description, double manaCost, Duration coolDown, int spellLevel, T effect) {
+        this.name = name;
+        this.description = description;
+        this.manaCost = manaCost;
+        this.coolDown = coolDown;
+        this.spellLevel = spellLevel;
+        this.spellEffect = effect;
+    }
+
+    protected AbstractSpell(String name, String description, double manaCost, Duration coolDown, T effect) {
+        this(name, description, manaCost, coolDown, 1, effect);
+    }
+
+    protected AbstractSpell(String name, String description, double manaCost, T effect) {
+        this(name, description, manaCost, Duration.ofSeconds(10L), effect);
+    }
+
+    protected AbstractSpell(String name, String description, T effect) {
+        this(name, description, 5.0, effect);
+    }
+
     @Override
     public String getSpellName() {
-        return null;
+        return name;
     }
 
     @Override
     public String getSpellDescription() {
-        return null;
+        return description;
     }
 
     @Override
     public double getManaCost() {
-        return 0;
+        return manaCost;
     }
 
     @Override
     public Duration getCoolDown() {
-        return null;
+        return coolDown;
     }
 
     @Override
     public int getSpellLevel() {
-        return 0;
+        return spellLevel;
     }
 
     @Override
-    public boolean isOnCoolDown() {
-        return false;
-    }
-
-    @Override
-    public SpellProjectile<? extends Projectile> getSpellProjectile() {
-        return null;
+    public T getEffect() {
+        return spellEffect;
     }
 }

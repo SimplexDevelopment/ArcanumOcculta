@@ -1,6 +1,7 @@
 package app.simplexdev.arcanumocculta.api.player;
 
 import app.simplexdev.arcanumocculta.api.book.SpellBook;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,11 @@ public interface Caster {
      * @return The name of the caster.
      */
     String getDisplayName();
+
+    /**
+     * @return The {@link Player} associated with this caster.
+     */
+    Player bukkit();
 
     /**
      * @return The amount of maximum mana the caster is allowed to have.

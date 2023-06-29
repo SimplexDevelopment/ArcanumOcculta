@@ -1,12 +1,12 @@
 package app.simplexdev.arcanumocculta.api.spell;
 
-import app.simplexdev.arcanumocculta.api.effect.SpellEffect;
+import app.simplexdev.arcanumocculta.api.effect.Effect;
+import app.simplexdev.arcanumocculta.api.effect.EffectProvider;
 import org.bukkit.entity.Projectile;
 
 import java.time.Duration;
 
-public interface Spell
-{
+public interface Spell<T extends Effect> {
     String getSpellName();
 
     String getSpellDescription();
@@ -17,7 +17,7 @@ public interface Spell
 
     int getSpellLevel();
 
-    boolean isOnCoolDown();
-
     SpellProjectile<? extends Projectile> getSpellProjectile();
+
+    T getEffect();
 }

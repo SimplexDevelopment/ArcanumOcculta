@@ -8,7 +8,7 @@ import org.bukkit.entity.Projectile;
 import java.util.List;
 
 public interface SpellProjectile<T extends Projectile> {
-    T getProjectile();
+    Class<T> getProjectileType();
 
     List<Particle> getParticles();
 
