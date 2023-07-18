@@ -1,6 +1,10 @@
 package app.simplexdev.arcanumocculta.api.spell;
 
 import app.simplexdev.arcanumocculta.api.caster.Caster;
+import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
+import app.simplexdev.arcanumocculta.api.spell.enums.Damages;
+import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
+import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
 import java.util.UUID;
 
@@ -17,15 +21,15 @@ public interface Spell
 
     String getDescription();
 
-    int getLevelRequirement();
+    CasterLevel getLevelRequirement();
 
-    double baseDamage();
+    Damages baseDamage();
 
     SpellEffect[] getSpellEffects();
 
-    long effectDuration();
+    Durations effectDuration();
 
-    double manaCost();
+    ManaCosts manaCost();
 
     long coolDown();
 

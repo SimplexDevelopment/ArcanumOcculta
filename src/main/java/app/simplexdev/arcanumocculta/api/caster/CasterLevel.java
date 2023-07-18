@@ -78,4 +78,8 @@ public enum CasterLevel
     {
         return this.experienceMarker;
     }
+
+    public boolean isAtLeast(final CasterLevel level) {
+        return this.getLevel() >= level.getLevel();
+    }
 }

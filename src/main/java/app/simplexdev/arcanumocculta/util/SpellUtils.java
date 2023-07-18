@@ -26,9 +26,16 @@ import app.simplexdev.arcanumocculta.api.caster.Caster;
 import app.simplexdev.arcanumocculta.api.spell.Spell;
 import app.simplexdev.arcanumocculta.api.spell.SpellEffect;
 import app.simplexdev.arcanumocculta.spells.PrimarySpellList;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Damageable;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public final class SpellUtils
 {
@@ -54,7 +61,22 @@ public final class SpellUtils
             effect.apply(target, caster);
     }
 
-    public static Spell copyFromPrimaryList(final String id) {
+    public static Spell copyFromPrimaryList(final String id)
+    {
         return SpellUtils.primarySpellList.getSpell(id).dupe();
+    }
+
+    public static ItemDisplay createProjectile(final Material visual, final World world, final Location location,
+                                               final Vector velocity)
+    {
+        final ItemDisplay display = (ItemDisplay) world.spawnEntity(location, EntityType.ITEM_DISPLAY);
+        display.setItemStack(new ItemStack(visual));
+        display.setGravity(true);
+        display.setPersistent(false);
+        display.setSilent(true);
+        display.setShadowRadius(0);
+        display.setShadowStrength(0);
+        display.setVelocity(velocity);
+        return display;
     }
 }

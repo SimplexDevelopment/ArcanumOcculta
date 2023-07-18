@@ -1,6 +1,10 @@
 package app.simplexdev.arcanumocculta.api.spell;
 
 import app.simplexdev.arcanumocculta.api.caster.Caster;
+import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
+import app.simplexdev.arcanumocculta.api.spell.enums.Damages;
+import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
+import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import java.util.SplittableRandom;
 import org.bukkit.Bukkit;
 
@@ -9,17 +13,17 @@ public abstract class AbstractSpell implements Spell
     private final String name;
     private final String id;
     private final String description;
-    private final int levelRequirement;
-    private final double baseDamage;
-    private final long effectDuration;
-    private final double manaCost;
+    private final CasterLevel levelRequirement;
+    private final Damages baseDamage;
+    private final Durations effectDuration;
+    private final ManaCosts manaCost;
     private final long coolDown;
     private final SplittableRandom random = new SplittableRandom();
 
     protected AbstractSpell(final String name, final String id,
-                            final String description, final int levelRequirement,
-                            final double baseDamage, final long effectDuration, final double manaCost,
-                            final long coolDown)
+                            final String description, final CasterLevel levelRequirement,
+                            final Damages baseDamage, final Durations effectDuration,
+                            final ManaCosts manaCost, final long coolDown)
     {
         this.name = name;
         this.id = id;
@@ -50,25 +54,25 @@ public abstract class AbstractSpell implements Spell
     }
 
     @Override
-    public int getLevelRequirement()
+    public CasterLevel getLevelRequirement()
     {
         return levelRequirement;
     }
 
     @Override
-    public double baseDamage()
+    public Damages baseDamage()
     {
         return baseDamage;
     }
 
     @Override
-    public long effectDuration()
+    public Durations effectDuration()
     {
         return effectDuration;
     }
 
     @Override
-    public double manaCost()
+    public ManaCosts manaCost()
     {
         return manaCost;
     }
@@ -99,7 +103,7 @@ public abstract class AbstractSpell implements Spell
     public boolean isUnlocked(Caster caster)
     {
         return caster.getSpellBook().hasSpell(this)
-            && caster.getCurrentLevel().getLevel() >= this.levelRequirement;
+            && caster.getCurrentLevel().isAtLeast(this.getLevelRequirement());
     }
 
     protected SplittableRandom random()
