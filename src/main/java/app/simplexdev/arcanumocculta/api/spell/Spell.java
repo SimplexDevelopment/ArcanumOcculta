@@ -1,23 +1,47 @@
 package app.simplexdev.arcanumocculta.api.spell;
 
-import app.simplexdev.arcanumocculta.api.effect.Effect;
-import app.simplexdev.arcanumocculta.api.effect.EffectProvider;
-import org.bukkit.entity.Projectile;
+import app.simplexdev.arcanumocculta.api.caster.Caster;
+import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
+import app.simplexdev.arcanumocculta.api.spell.enums.Damages;
+import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
+import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
+import app.simplexdev.arcanumocculta.api.wand.Wand;
+import java.util.UUID;
 
-import java.time.Duration;
+public interface Spell
+{
+    String getName();
 
-public interface Spell<T extends Effect> {
-    String getSpellName();
+    String getId();
 
-    String getSpellDescription();
+    default UUID getUniqueId()
+    {
+        return UUID.nameUUIDFromBytes(this.getName().getBytes());
+    }
 
-    double getManaCost();
+    String getDescription();
 
-    Duration getCoolDown();
+    CasterLevel getLevelRequirement();
 
-    int getSpellLevel();
+    Damages baseDamage();
 
-    SpellProjectile<? extends Projectile> getSpellProjectile();
+    SpellEffect[] getSpellEffects();
 
-    T getEffect();
+    Durations effectDuration();
+
+    ManaCosts manaCost();
+
+    long coolDown();
+
+    boolean isUnlocked(final Caster caster);
+
+    void cast(final Caster caster, final Wand wand);
+
+    /**
+     * Used to create a copy of the spell for player spell books.
+     * Should only ever be used by the primary list when initializing a player's spell book.
+     *
+     * @return a copy of the spell.
+     */
+    Spell dupe();
 }
