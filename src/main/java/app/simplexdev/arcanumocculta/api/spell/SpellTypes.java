@@ -1,5 +1,6 @@
 package app.simplexdev.arcanumocculta.api.spell;
 
+// Reference for implementation.
 public enum SpellTypes
 {
     SOUL_PEBBLE, SOUL_SHARD, LARGE_SOUL_SHARD, SOUL_COMET_SHARD, SOUL_COMET, SOUL_SHARD_SPIRAL, SOUL_STARS,
