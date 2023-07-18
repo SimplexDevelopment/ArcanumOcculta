@@ -3,19 +3,15 @@ package app.simplexdev.arcanumocculta.spells.soul;
 import app.simplexdev.arcanumocculta.api.caster.Caster;
 import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
 import app.simplexdev.arcanumocculta.api.spell.AbstractSpell;
+import app.simplexdev.arcanumocculta.api.spell.SpellEffect;
 import app.simplexdev.arcanumocculta.api.spell.enums.Damages;
 import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
-import app.simplexdev.arcanumocculta.api.spell.SpellEffect;
 import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
 import app.simplexdev.arcanumocculta.util.SpellUtils;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
-import org.bukkit.entity.ItemDisplay;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
+import org.bukkit.entity.Entity;
 
 public final class SoulPebble extends AbstractSpell
 {
@@ -35,56 +31,33 @@ public final class SoulPebble extends AbstractSpell
     public SpellEffect[] getSpellEffects()
     {
         final SpellEffect[] effects = new SpellEffect[1];
-        effects[0] = (target, caster) ->
-        {
-            final Wand wand = caster.getWand();
-            final double damage = baseDamage().multiply(wand.getSpellBonus());
-
-            SpellUtils.damage(target, caster.bukkit(), damage);
-        };
+        effects[0] = SpellUtils.soulEffectBase(baseDamage());
         return effects;
     }
 
     @Override
     public void cast(Caster caster, Wand wand)
     {
-        if (this.manaCost().isMoreThan(caster.getCurrentMana()))
+        if (!this.checkManaCosts(caster))
         {
-            caster.bukkit().sendMessage("You do not have enough mana to cast this spell!");
             return;
         }
 
-        final double expMod = this.getLevelRequirement().getExperienceMarker();
-
-        final Player player = caster.bukkit();
-        final Location location = player.getLocation().clone().add(0, player.getEyeHeight(), 0);
-        final Vector velocity = player.getLocation().getDirection().multiply(2);
-        final ItemDisplay projectile = SpellUtils.createProjectile(Material.AIR, player.getWorld(), location,
-                                                                   velocity);
-        caster.removeMana(this.manaCost().getManaCost());
-        caster.addExperience(random().nextDouble(expMod * 0.25));
+        final Entity projectile = prepareProjectile(caster, Material.AIR);
 
         while (!projectile.isOnGround() || !projectile.isDead())
         {
-            projectile.getWorld().spawnParticle(Particle.SOUL, projectile.getLocation(), 1,
-                                                random().nextGaussian() * 0.2,
-                                                random().nextGaussian() * 0.2,
-                                                random().nextGaussian() * 0.2);
+            tracer(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
 
-            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty()) {
-                projectile.getNearbyEntities(1, 1, 1)
-                          .stream()
-                          .filter(LivingEntity.class::isInstance)
-                          .map(LivingEntity.class::cast)
-                          .forEach(entity -> SpellUtils.applyEffects(
-                              this.getSpellEffects(),
-                              entity,
-                              caster));
+            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())
+            {
+                applyEffects(projectile.getNearbyEntities(1, 1, 1),
+                             caster);
                 projectile.remove();
-                break;
             }
-        }
 
-        if (projectile.isOnGround()) projectile.remove();
+            if (projectile.isOnGround())
+                projectile.remove();
+        }
     }
 }

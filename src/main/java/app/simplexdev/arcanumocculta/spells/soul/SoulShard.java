@@ -30,6 +30,12 @@ import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
 import app.simplexdev.arcanumocculta.api.spell.SpellEffect;
 import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
+import app.simplexdev.arcanumocculta.util.SpellUtils;
+import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 public final class SoulShard extends AbstractSpell
 {
@@ -46,12 +52,36 @@ public final class SoulShard extends AbstractSpell
     @Override
     public SpellEffect[] getSpellEffects()
     {
-        return new SpellEffect[0];
+        final SpellEffect[] effects = new SpellEffect[1];
+        effects[0] = SpellUtils.soulEffectBase(baseDamage());
+        return effects;
     }
 
     @Override
     public void cast(Caster caster, Wand wand)
     {
+        if (!this.checkManaCosts(caster))
+        {
+            return;
+        }
 
+        final Entity projectile = prepareProjectile(caster, Material.AIR);
+
+        while (!projectile.isDead()) {
+            for (int i = 0; i < 3; i++) {
+                tracer(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
+            }
+
+            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())
+            {
+                applyEffects(projectile.getNearbyEntities(1, 1, 1),
+                             caster);
+                projectile.remove();
+            }
+
+            if (projectile.isOnGround()) {
+                projectile.remove();
+            }
+        }
     }
 }
