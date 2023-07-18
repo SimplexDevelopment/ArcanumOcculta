@@ -1,0 +1,18 @@
+caster:
+  caster_rank: 1
+  current_experience: 0
+  current_mana: 100
+  max_mana: 100
+  spell_influence: 0
+  spell_points: 0
+
+spellbook:
+  - FIREBALL
+
+wand:
+  name: Basic Wand
+  description: A basic wand
+  item: STICK
+  core: WOOD
+  gem: NONE
+  cap: IRON
