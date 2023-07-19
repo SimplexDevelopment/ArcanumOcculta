@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package app.simplexdev.arcanumocculta.spells.soul;
+package app.simplexdev.arcanumocculta.spells.flame;
 
 import app.simplexdev.arcanumocculta.api.caster.Caster;
 import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
@@ -32,60 +32,48 @@ import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
 import app.simplexdev.arcanumocculta.util.SpellUtils;
 import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
-public final class SoulShard extends AbstractSpell
+public class FlameSling extends AbstractSpell
 {
-    public SoulShard()
+    protected FlameSling()
     {
-        super("Soul Shard",
-              "soul_shard",
-              "A larger version of soul pebble.",
-              CasterLevel.APPRENTICE, Damages.LIGHT,
-              Durations.INSTANT, ManaCosts.LIGHT_CAST,
-              5L);
+        super("Flame Sling", "flame_sling",
+              "Lob a ball of fire at your enemies!",
+              CasterLevel.APPRENTICE,
+              Damages.LIGHT,
+              Durations.MEDIUM,
+              ManaCosts.LIGHT_CAST,
+              10L);
     }
 
     @Override
     public SpellEffect[] getSpellEffects()
     {
         final SpellEffect[] effects = new SpellEffect[1];
-        effects[0] = SpellUtils.soulEffectBase(baseDamage());
+        effects[0] = SpellUtils.flameEffectBase(baseDamage());
         return effects;
     }
 
     @Override
     public void cast(Caster caster, Wand wand)
     {
-        if (!this.checkManaCosts(caster))
-        {
+        if (!checkManaCosts(caster))
             return;
-        }
 
-        final Entity projectile = prepareProjectile(caster, Material.AIR,
+        final Entity projectile = prepareProjectile(caster, Material.FIRE_CHARGE,
                                                     caster.bukkit()
-                                                          .getLocation()
-                                                          .clone()
-                                                          .getDirection()
-                                                          .multiply(2));
+                                                          .getLocation().clone()
+                                                          .getDirection().multiply(2));
 
-        while (!projectile.isDead())
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                tracer(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
-            }
-
-            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())
-            {
-                applyEffects(projectile.getNearbyEntities(1, 1, 1),
-                             caster);
+        while (!projectile.isDead()) {
+            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty()) {
+                applyEffects(projectile.getNearbyEntities(1, 1, 1), caster);
                 projectile.remove();
             }
 
-            if (projectile.isOnGround())
-            {
+            if (projectile.isOnGround()) {
                 projectile.remove();
             }
         }

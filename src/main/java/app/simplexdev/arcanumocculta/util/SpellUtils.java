@@ -25,6 +25,7 @@ package app.simplexdev.arcanumocculta.util;
 import app.simplexdev.arcanumocculta.api.spell.Spell;
 import app.simplexdev.arcanumocculta.api.spell.SpellEffect;
 import app.simplexdev.arcanumocculta.api.spell.enums.Damages;
+import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
 import app.simplexdev.arcanumocculta.spells.PrimarySpellList;
 import java.util.SplittableRandom;
 import org.bukkit.Particle;
@@ -83,13 +84,13 @@ public final class SpellUtils
         };
     }
 
-    public static SpellEffect witherEffectBase(final Damages baseDamage)
+    public static SpellEffect witherEffectBase(final Damages baseDamage, final Durations duration)
     {
         return (target, caster) ->
         {
             final var damage = baseDamage.multiply(caster.getWand().getSpellBonus());
             // Wither for 10 seconds.
-            target.addPotionEffect(PotionEffectType.WITHER.createEffect(200, 2));
+            target.addPotionEffect(PotionEffectType.WITHER.createEffect((int) duration.getTicks(), 3));
 
             damage(target, caster.bukkit(), damage);
         };

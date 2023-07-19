@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package app.simplexdev.arcanumocculta.spells.soul;
+package app.simplexdev.arcanumocculta.spells.wither;
 
 import app.simplexdev.arcanumocculta.api.caster.Caster;
 import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
@@ -31,61 +31,61 @@ import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
 import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
 import app.simplexdev.arcanumocculta.util.SpellUtils;
+import java.util.List;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
-public final class SoulShard extends AbstractSpell
+public final class WitherMeteorite extends AbstractSpell
 {
-    public SoulShard()
+
+    public WitherMeteorite()
     {
-        super("Soul Shard",
-              "soul_shard",
-              "A larger version of soul pebble.",
-              CasterLevel.APPRENTICE, Damages.LIGHT,
-              Durations.INSTANT, ManaCosts.LIGHT_CAST,
-              5L);
+        super("Wither Meteorite",
+              "wither_meteorite",
+              "Call down a wither skull from the heavens to wreak havoc on your enemies.",
+              CasterLevel.ARCH_MAGE,
+              Damages.OVERKILL,
+              Durations.MEDIUM,
+              ManaCosts.IMMENSE_CAST,
+              600L);
     }
 
     @Override
     public SpellEffect[] getSpellEffects()
     {
-        final SpellEffect[] effects = new SpellEffect[1];
-        effects[0] = SpellUtils.soulEffectBase(baseDamage());
+        final SpellEffect[] effects = new SpellEffect[2];
+        effects[0] = SpellUtils.witherEffectBase(baseDamage(), effectDuration());
         return effects;
     }
 
     @Override
     public void cast(Caster caster, Wand wand)
     {
-        if (!this.checkManaCosts(caster))
-        {
+        if (this.checkManaCosts(caster))
             return;
-        }
 
-        final Entity projectile = prepareProjectile(caster, Material.AIR,
-                                                    caster.bukkit()
-                                                          .getLocation()
-                                                          .clone()
-                                                          .getDirection()
-                                                          .multiply(2));
+        final Location location = caster.bukkit().getEyeLocation().clone().add(0, 256, 0);
+        final Vector direction = location.getDirection().add(new Vector(0, -5, 0));
+        final Entity projectile = prepareProjectile(caster,
+                                                    Material.WITHER_SKELETON_SKULL,
+                                                    direction);
+
+        getSpellEffects()[1] = SpellUtils.meteorLikeEffectBase(baseDamage(), direction, 4F);
 
         while (!projectile.isDead())
         {
-            for (int i = 0; i < 3; i++)
+            if (!projectile.getNearbyEntities(5, 5, 5).isEmpty())
             {
-                tracer(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
-            }
-
-            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())
-            {
-                applyEffects(projectile.getNearbyEntities(1, 1, 1),
-                             caster);
+                final List<Entity> e = projectile.getNearbyEntities(5, 5, 5);
+                applyEffects(e, caster);
                 projectile.remove();
             }
 
             if (projectile.isOnGround())
             {
+                simulateExplosion(projectile.getLocation(), 4F, true);
                 projectile.remove();
             }
         }

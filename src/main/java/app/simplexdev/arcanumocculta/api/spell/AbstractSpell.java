@@ -14,12 +14,16 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 public abstract class AbstractSpell implements Spell
@@ -146,18 +150,21 @@ public abstract class AbstractSpell implements Spell
                .filter(LivingEntity.class::isInstance)
                .map(LivingEntity.class::cast)
                .forEach(entity -> applyEffectsIndividually(
-                   getSpellEffects(),
                    entity,
-                   caster));
+                   caster,
+                   getSpellEffects()));
     }
 
-    public Entity prepareProjectile(final Caster caster, final Material visual)
+    public void simulateExplosion(final Location location, final float size, boolean breakBlocks) {
+        location.getWorld().createExplosion(location, size, true, breakBlocks);
+    }
+
+    public Entity prepareProjectile(final Caster caster, final Material visual, final Vector velocity)
     {
         final double expMod = getLevelRequirement().getExperienceMarker();
 
         final Player player = caster.bukkit();
         final Location location = player.getLocation().clone().add(0, player.getEyeHeight(), 0);
-        final Vector velocity = player.getLocation().getDirection().multiply(2);
         final Entity projectile = createProjectile(visual, player.getWorld(), location,
                                                               velocity);
         caster.removeMana(manaCost().getManaCost());
@@ -175,8 +182,43 @@ public abstract class AbstractSpell implements Spell
                             random().nextDouble(-2, 2));
     }
 
-    private void applyEffectsIndividually(final SpellEffect[] effects, final LivingEntity target,
-                                          final Caster caster)
+    public void spiral(final World world, final Location location, final Particle particle)
+    {
+        final double step = 0.5;
+        final double radius = 2;
+        final double area = Math.PI * Math.pow(radius, 2);
+        final double theta = area / step;
+        final double phi = step / radius;
+        for (double i = 0; i < theta; i += phi)
+        {
+            final double x = radius * Math.cos(i);
+            final double z = radius * Math.sin(i);
+            world.spawnParticle(particle, location.clone().add(x, 0, z), 0);
+        }
+    }
+
+    public AreaEffectCloud cloud(final World world,
+                      final Location location,
+                      final Particle particle,
+                      final float size,
+                      final int duration,
+                      final PotionType effect) {
+        AreaEffectCloud cloud = (AreaEffectCloud) world.spawnEntity(location, EntityType.AREA_EFFECT_CLOUD);
+        cloud.setParticle(particle);
+        cloud.setDuration(duration);
+
+        if (effect != null) {
+            cloud.setBasePotionData(new PotionData(effect));
+        }
+
+        cloud.setRadius(size);
+        cloud.setRadiusPerTick(size / 0.5F);
+
+        return cloud;
+    }
+
+    protected void applyEffectsIndividually(final LivingEntity target,
+                                          final Caster caster, final SpellEffect... effects)
     {
         for (final SpellEffect effect : effects)
             effect.apply(target, caster);

@@ -43,7 +43,12 @@ public final class SoulPebble extends AbstractSpell
             return;
         }
 
-        final Entity projectile = prepareProjectile(caster, Material.AIR);
+        final Entity projectile = prepareProjectile(caster, Material.AIR,
+                                                    caster.bukkit()
+                                                          .getLocation()
+                                                          .clone()
+                                                          .getDirection()
+                                                          .multiply(2));
 
         while (!projectile.isOnGround() || !projectile.isDead())
         {
