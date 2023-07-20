@@ -44,15 +44,11 @@ public final class SoulPebble extends AbstractSpell
         }
 
         final Entity projectile = prepareProjectile(caster, Material.AIR,
-                                                    caster.bukkit()
-                                                          .getLocation()
-                                                          .clone()
-                                                          .getDirection()
-                                                          .multiply(2));
+                                                    tracerVector(caster));
 
         while (!projectile.isOnGround() || !projectile.isDead())
         {
-            tracer(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
+            tracerDirectional(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
 
             if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())
             {

@@ -63,9 +63,7 @@ public class FlameSling extends AbstractSpell
             return;
 
         final Entity projectile = prepareProjectile(caster, Material.FIRE_CHARGE,
-                                                    caster.bukkit()
-                                                          .getLocation().clone()
-                                                          .getDirection().multiply(2));
+                                                    tracerVector(caster));
 
         while (!projectile.isDead()) {
             if (!projectile.getNearbyEntities(1, 1, 1).isEmpty()) {

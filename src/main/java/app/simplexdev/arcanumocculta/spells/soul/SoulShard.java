@@ -64,17 +64,13 @@ public final class SoulShard extends AbstractSpell
         }
 
         final Entity projectile = prepareProjectile(caster, Material.AIR,
-                                                    caster.bukkit()
-                                                          .getLocation()
-                                                          .clone()
-                                                          .getDirection()
-                                                          .multiply(2));
+                                                    tracerVector(caster));
 
         while (!projectile.isDead())
         {
             for (int i = 0; i < 3; i++)
             {
-                tracer(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
+                tracerDirectional(projectile.getWorld(), projectile.getLocation(), Particle.SOUL);
             }
 
             if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())

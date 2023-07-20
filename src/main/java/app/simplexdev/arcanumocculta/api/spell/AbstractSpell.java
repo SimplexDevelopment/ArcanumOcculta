@@ -5,7 +5,6 @@ import app.simplexdev.arcanumocculta.api.caster.CasterLevel;
 import app.simplexdev.arcanumocculta.api.spell.enums.Damages;
 import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
 import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
-import app.simplexdev.arcanumocculta.util.SpellUtils;
 import java.util.List;
 import java.util.SplittableRandom;
 import org.bukkit.Bukkit;
@@ -22,7 +21,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
@@ -51,6 +49,20 @@ public abstract class AbstractSpell implements Spell
         this.effectDuration = effectDuration;
         this.manaCost = manaCost;
         this.coolDown = coolDown;
+    }
+
+    private static ItemDisplay createProjectile(final Material visual, final World world, final Location location,
+                                                final Vector velocity)
+    {
+        final ItemDisplay display = (ItemDisplay) world.spawnEntity(location, EntityType.ITEM_DISPLAY);
+        display.setItemStack(new ItemStack(visual));
+        display.setGravity(true);
+        display.setPersistent(false);
+        display.setSilent(true);
+        display.setShadowRadius(0);
+        display.setShadowStrength(0);
+        display.setVelocity(velocity);
+        return display;
     }
 
     @Override
@@ -155,8 +167,29 @@ public abstract class AbstractSpell implements Spell
                    getSpellEffects()));
     }
 
-    public void simulateExplosion(final Location location, final float size, boolean breakBlocks) {
+    public void simulateExplosion(final Location location, final float size, boolean breakBlocks)
+    {
         location.getWorld().createExplosion(location, size, true, breakBlocks);
+    }
+
+    public Vector tracerVector(final Caster caster)
+    {
+        return caster.bukkit().getLocation().clone().getDirection().multiply(2);
+    }
+
+    public Location topLocation(final Caster caster)
+    {
+        final World world = caster.bukkit().getWorld();
+        final Location eyeLocation = caster.bukkit().getEyeLocation().clone();
+        final int diff = world.getMaxHeight() - eyeLocation.getBlockY();
+        return eyeLocation.add(0, diff, 0);
+    }
+
+    public Vector meteorVector(final Caster caster)
+    {
+        final Location topLocation = topLocation(caster);
+        final Vector v = topLocation.getDirection().normalize();
+        return v.multiply(new Vector(0, -5, 0));
     }
 
     public Entity prepareProjectile(final Caster caster, final Material visual, final Vector velocity)
@@ -166,13 +199,13 @@ public abstract class AbstractSpell implements Spell
         final Player player = caster.bukkit();
         final Location location = player.getLocation().clone().add(0, player.getEyeHeight(), 0);
         final Entity projectile = createProjectile(visual, player.getWorld(), location,
-                                                              velocity);
+                                                   velocity);
         caster.removeMana(manaCost().getManaCost());
         caster.addExperience(random().nextDouble(expMod * 0.25));
         return projectile;
     }
 
-    public void tracer(final World world, final Location location, final Particle particle)
+    public void tracerDirectional(final World world, final Location location, final Particle particle)
     {
         world.spawnParticle(particle,
                             location,
@@ -180,6 +213,13 @@ public abstract class AbstractSpell implements Spell
                             random().nextDouble(-2, 2),
                             random().nextDouble(-2, 2),
                             random().nextDouble(-2, 2));
+    }
+
+    public void tracerRGB(final World world, final Location location,
+                          final Particle particle, final int r,
+                          final int g, final int b)
+    {
+        world.spawnParticle(particle, location, 0, r, g, b);
     }
 
     public void spiral(final World world, final Location location, final Particle particle)
@@ -198,16 +238,18 @@ public abstract class AbstractSpell implements Spell
     }
 
     public AreaEffectCloud cloud(final World world,
-                      final Location location,
-                      final Particle particle,
-                      final float size,
-                      final int duration,
-                      final PotionType effect) {
+                                 final Location location,
+                                 final Particle particle,
+                                 final float size,
+                                 final int duration,
+                                 final PotionType effect)
+    {
         AreaEffectCloud cloud = (AreaEffectCloud) world.spawnEntity(location, EntityType.AREA_EFFECT_CLOUD);
         cloud.setParticle(particle);
         cloud.setDuration(duration);
 
-        if (effect != null) {
+        if (effect != null)
+        {
             cloud.setBasePotionData(new PotionData(effect));
         }
 
@@ -218,23 +260,9 @@ public abstract class AbstractSpell implements Spell
     }
 
     protected void applyEffectsIndividually(final LivingEntity target,
-                                          final Caster caster, final SpellEffect... effects)
+                                            final Caster caster, final SpellEffect... effects)
     {
         for (final SpellEffect effect : effects)
             effect.apply(target, caster);
-    }
-
-    private static ItemDisplay createProjectile(final Material visual, final World world, final Location location,
-                                               final Vector velocity)
-    {
-        final ItemDisplay display = (ItemDisplay) world.spawnEntity(location, EntityType.ITEM_DISPLAY);
-        display.setItemStack(new ItemStack(visual));
-        display.setGravity(true);
-        display.setPersistent(false);
-        display.setSilent(true);
-        display.setShadowRadius(0);
-        display.setShadowStrength(0);
-        display.setVelocity(velocity);
-        return display;
     }
 }

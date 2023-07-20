@@ -31,29 +31,28 @@ import app.simplexdev.arcanumocculta.api.spell.enums.Durations;
 import app.simplexdev.arcanumocculta.api.spell.enums.ManaCosts;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
 import app.simplexdev.arcanumocculta.util.SpellUtils;
-import java.util.List;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 
-public final class WitherMeteorite extends AbstractSpell
+public class WitherBurst extends AbstractSpell
 {
 
-    public WitherMeteorite()
+    protected WitherBurst()
     {
-        super("Wither Meteorite",
-              "wither_meteorite",
-              "Call down a wither skull from the heavens to wreak havoc on your enemies.",
-              CasterLevel.ARCH_MAGE,
-              Damages.OVERKILL,
+        super("Wither Burst", "wither_burst",
+              "Fire a bolt of withering energy at your enemies.",
+              CasterLevel.ADEPT,
+              Damages.SEVERE,
               Durations.MEDIUM,
-              ManaCosts.IMMENSE_CAST,
-              600L);
+              ManaCosts.HEAVY_CAST,
+              120L);
     }
 
     @Override
     public SpellEffect[] getSpellEffects()
     {
-        final SpellEffect[] effects = new SpellEffect[2];
+        final SpellEffect[] effects = new SpellEffect[1];
         effects[0] = SpellUtils.witherEffectBase(baseDamage(), effectDuration());
         return effects;
     }
@@ -65,23 +64,21 @@ public final class WitherMeteorite extends AbstractSpell
             return;
 
         final Entity projectile = prepareProjectile(caster,
-                                                    Material.WITHER_SKELETON_SKULL,
-                                                    meteorVector(caster));
-
-        getSpellEffects()[1] = SpellUtils.meteorLikeEffectBase(baseDamage(), meteorVector(caster), 4F);
+                                                    Material.AIR,
+                                                    tracerVector(caster));
 
         while (!projectile.isDead())
         {
-            if (!projectile.getNearbyEntities(5, 5, 5).isEmpty())
+            tracerRGB(projectile.getWorld(), projectile.getLocation(), Particle.SPELL_MOB, 16, 16, 16);
+
+            if (!projectile.getNearbyEntities(1, 1, 1).isEmpty())
             {
-                final List<Entity> e = projectile.getNearbyEntities(5, 5, 5);
-                applyEffects(e, caster);
+                applyEffects(projectile.getNearbyEntities(1, 1, 1), caster);
                 projectile.remove();
             }
 
             if (projectile.isOnGround())
             {
-                simulateExplosion(projectile.getLocation(), 4F, true);
                 projectile.remove();
             }
         }
