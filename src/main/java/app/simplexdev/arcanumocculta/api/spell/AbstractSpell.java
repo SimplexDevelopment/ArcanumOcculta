@@ -194,7 +194,7 @@ public abstract class AbstractSpell implements Spell
 
     public Entity prepareProjectile(final Caster caster, final Material visual, final Vector velocity)
     {
-        final double expMod = getLevelRequirement().getExperienceMarker();
+        final double expMod = getLevelRequirement().getNextLevelExp();
 
         final Player player = caster.bukkit();
         final Location location = player.getLocation().clone().add(0, player.getEyeHeight(), 0);

@@ -18,17 +18,17 @@ public enum CasterLevel
     ARCH_MAGE(9, 4000D, "Arch-Mage", "an Arch-Mage", ChatColor.BLACK, "Lvl9");
 
     private final int level;
-    private final double experienceMarker;
+    private final double nextLevelExp;
     private final String name;
     private final String plural;
     private final ChatColor rankColor;
     private final String suffix;
 
-    CasterLevel(final int level, final double experienceMarker, final String name, final String plural,
+    CasterLevel(final int level, final double nextLevelExp, final String name, final String plural,
                 final ChatColor rankColor,
                 final String suffix)
     {
-        this.experienceMarker = experienceMarker;
+        this.nextLevelExp = nextLevelExp;
         this.level = level;
         this.name = name;
         this.plural = plural;
@@ -74,9 +74,9 @@ public enum CasterLevel
         return this.suffix;
     }
 
-    public double getExperienceMarker()
+    public double getNextLevelExp()
     {
-        return this.experienceMarker;
+        return this.nextLevelExp;
     }
 
     public boolean isAtLeast(final CasterLevel level) {

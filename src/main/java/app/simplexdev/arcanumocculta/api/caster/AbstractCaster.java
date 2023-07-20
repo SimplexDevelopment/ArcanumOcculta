@@ -1,5 +1,6 @@
 package app.simplexdev.arcanumocculta.api.caster;
 
+import app.simplexdev.arcanumocculta.api.event.ExperienceUpdateEvent;
 import app.simplexdev.arcanumocculta.api.wand.Wand;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -31,6 +32,7 @@ public abstract class AbstractCaster implements Caster
         return this.wand;
     }
 
+    @Override
     public void setWand(final Wand wand)
     {
         this.wand = wand;
@@ -60,6 +62,7 @@ public abstract class AbstractCaster implements Caster
         return this.level;
     }
 
+    @Override
     public void setCurrentLevel(final CasterLevel level)
     {
         this.level = level;
@@ -71,9 +74,12 @@ public abstract class AbstractCaster implements Caster
         return this.currentExperience;
     }
 
+    @Override
     public void setCurrentExperience(final double experience)
     {
         this.currentExperience = experience;
+        final ExperienceUpdateEvent event = new ExperienceUpdateEvent(this, experience);
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     @Override
@@ -82,6 +88,7 @@ public abstract class AbstractCaster implements Caster
         return this.currentMana;
     }
 
+    @Override
     public void setCurrentMana(final double mana)
     {
         this.currentMana = mana;
@@ -99,34 +106,48 @@ public abstract class AbstractCaster implements Caster
         this.maxMana = mana;
     }
 
+    @Override
     public void addExperience(final double experience)
     {
         this.currentExperience = this.currentExperience + experience;
+        final ExperienceUpdateEvent event = new ExperienceUpdateEvent(this, getCurrentExperience());
+        Bukkit.getPluginManager().callEvent(event);
     }
 
+    @Override
     public void removeExperience(final double experience)
     {
         this.currentExperience = this.currentExperience - experience;
+        final ExperienceUpdateEvent event = new ExperienceUpdateEvent(this, getCurrentExperience());
+        Bukkit.getPluginManager().callEvent(event);
     }
 
+    @Override
     public void addMana(final double mana)
     {
         this.currentMana = this.currentMana + mana;
     }
 
+    @Override
     public void removeMana(final double mana)
     {
         this.currentMana = this.currentMana - mana;
     }
 
+    /**
+     * Sets the current mana to the max mana.
+     */
     public void setManaToMax()
     {
         this.currentMana = this.maxMana;
     }
 
+    @Override
     public void setExperienceToZero()
     {
         this.currentExperience = 0;
+        final ExperienceUpdateEvent event = new ExperienceUpdateEvent(this, getCurrentExperience());
+        Bukkit.getPluginManager().callEvent(event);
     }
 
     @Override

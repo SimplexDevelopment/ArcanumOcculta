@@ -44,6 +44,12 @@ public abstract class AbstractSpellBook implements SpellBook
                           .orElse(getSpells().get(0));
     }
 
+    /**
+     * Get a spell by its unique id
+     *
+     * @param uuid the unique id of the spell
+     * @return The spell, or null if none found.
+     */
     public Spell getSpell(UUID uuid)
     {
         return getSpells().stream()
@@ -84,7 +90,13 @@ public abstract class AbstractSpellBook implements SpellBook
         this.spells.clear();
     }
 
-    public void addAll(Collection<? extends Spell> spells) {
+    /**
+     * Add a collection of spells to the spell book
+     *
+     * @param spells The spells to add
+     */
+    public void addAll(Collection<? extends Spell> spells)
+    {
         this.spells.addAll(spells);
     }
 
